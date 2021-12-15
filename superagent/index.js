@@ -156,8 +156,7 @@ async function getRubbishType (word) {
 module.exports = {
     getOne,
     getWeather,
-    // getTXweather,
-    // getReply,
-    // getSweetWord,
-    // getRubbishType
+    getReply,
+    getSweetWord,
+    getRubbishType
 };

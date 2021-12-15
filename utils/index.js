@@ -9,14 +9,13 @@ function getDay (date) {
   return iDays;
 }
 
-function formatDate (date) {
+function formatDate (date, type = 'day') {
   var tempDate = new Date(date);
   var year = tempDate.getFullYear();
   var month = tempDate.getMonth() + 1;
   var day = tempDate.getDate();
-  // var hour = tempDate.getHours();
-  // var min = tempDate.getMinutes();
-  // var second = tempDate.getSeconds();
+  var hour = tempDate.getHours();
+  var min = tempDate.getMinutes();
   var week = tempDate.getDay();
   var str = '';
   if (week === 0) {
@@ -34,38 +33,18 @@ function formatDate (date) {
   } else if (week === 6) {
     str = '星期六';
   }
-  // if (hour < 10) {
-  //   hour = '0' + hour;
-  // }
-  // if (min < 10) {
-  //   min = '0' + min;
-  // }
-  // if (second < 10) {
-  //   second = '0' + second;
-  // }
-  return year + '-' + month + '-' + day + ' ' + str;
+  if (hour < 10) {
+    hour = '0' + hour;
+  }
+  if (min < 10) {
+    min = '0' + min;
+  }
+  if (type === 'day') {
+    return year + '-' + month + '-' + day + ' ' + str;
+  }
+  return year + '-' + month + '-' + day + ' ' + hour + ':' + min;
 }
 
-// 获取距离 下次拥抱纪念日还有多少天
-function getHugDay () {
-  const time = config.HUG_DAY;
-  // 获取当前时间戳
-  const now = moment(moment().format('YYYY-MM-DD')).valueOf();
-  // 获取纪念日 月-日
-  const mmdd = moment(time).format('-MM-DD');
-  // 获取当年
-  const y = moment().year();
-  // 获取今年拥抱纪念日时间戳
-  const nowTimeNumber = moment(y + mmdd).valueOf();
-  // 判断 今天的纪念日 有没有过，如果已经过去（now>nowTimeNumber），resultHug日期为明年的纪念日
-  // 如果还没到，则 结束日期为今年的拥抱纪念日
-  let resultHug = nowTimeNumber;
-  if (now > nowTimeNumber) {
-    // 获取明年纪念日
-    resultHug = moment((y + 1) + mmdd).valueOf();
-  }
-  return moment(moment(resultHug).format()).diff(moment(now).format(), 'day');
-}
 // 获取 距离 下次生日还有多少天
 function getBirthday () {
   const time = config.BIRTHDAY;
@@ -87,27 +66,50 @@ function getBirthday () {
   }
   return moment(moment(resultBirthday).format()).diff(moment(now).format(), 'day');
 }
+// 获取是第几个生日
+function getBirthYear () {
+  const birthYear = config.BRITHYEAR;
+  return moment().year() - birthYear;
+}
 function getDiffDay (type) {
   const time = config[type]
   return moment(moment().format('YYYY-MM-DD')).diff(time, 'day');
 }
-// 获取 拥抱几年了
-function getHugYear () {
-  const time = config.HUG_DAY;
-  return moment().year() - moment(time).year();
+// 获取距离 下次纪念日还有多少天
+function getSameDay (type) {
+  const time = config[type];
+  // 获取当前时间戳
+  const now = moment(moment().format('YYYY-MM-DD')).valueOf();
+  // 获取纪念日 月-日
+  const mmdd = moment(time).format('-MM-DD');
+  // 获取当年
+  const y = moment().year();
+  // 获取今年拥抱纪念日时间戳
+  const nowTimeNumber = moment(y + mmdd).valueOf();
+  // 判断 今年的纪念日 有没有过
+ 
+  if (now === nowTimeNumber) {
+    return {
+      result: true,
+      type
+    }
+  }
+  return {
+    result: false,
+    type
+  }
 }
-// 获取是第几个生日
-function getBirthYear () {
-  const birthYear = config.time.birthYear;
-  return moment().year() - birthYear;
+// 获取 几年了
+function getDiffYear (type) {
+  return moment().year() - moment(config[type]).year();
 }
 
 module.exports = {
   getDay,
-  getHugDay,
+  getSameDay,
   getBirthday,
   getDiffDay,
-  getHugYear,
+  getDiffYear,
   getBirthYear,
   formatDate,
 };
