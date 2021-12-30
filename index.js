@@ -95,7 +95,7 @@ async function initWeatherDay () {
       (await bot.Contact.find({ name: config.NICKNAME })) ||
       (await bot.Contact.find({ alias: config.NAME })); // 获取你要发送的联系人
     let one = await superagent.getOne(); //获取每日一句
-    let weather = await superagent.getWeather(); //获取天气信息
+    let weather = await superagent.getNewWeather(); //获取天气信息
     let today = await untils.formatDate(new Date()); //获取今天的日期
     let week = new Date().getDay();
     let str = '';

@@ -6,6 +6,7 @@ let md5 = crypto.createHash('md5');
 let uniqueId = md5.update(machineIdSync()).digest('hex'); // 获取机器唯一识别码并MD5，方便机器人上下文关联
 const ONE = 'https://v1.hitokoto.cn'; // 每日一句
 const TXHOST = 'http://api.tianapi.com/txapi/'; // 天行host
+const WEATHER = "https://www.douyacun.com/api/openapi/weather"
 
 async function getOne () {
     // 获取每日一句
@@ -15,6 +16,63 @@ async function getOne () {
     } catch (err) {
         console.log('获取每日一句出错', err);
         return '今日只有我爱你！';
+    }
+}
+
+async function getNewWeather () {
+    // 获取天行天气
+    let url = WEATHER + '?adCode=310100&weather_type=forecast_hour|forecast_day|alarm|limit|rise|observe|index|air&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY2NvdW50SWQiOiIyM2ZhOTE3OTFlN2JlZDYzOTViMjUzYWIyMDNkNzA3ZSJ9.1TU-oa8kzzDS-LWt_tFtdR6L0X1ad896-B5qM_ubiyU';
+    try {
+        let { code, data } = await superagent.req({
+            url, method: 'GET'
+        });
+        const { forecast_day, forecast_hour: hours, alarm, air } = data;
+        if (code === 0) {
+            let todayInfo = forecast_day[1];
+            let tomorrowInfo = forecast_day[2];
+            let hour = new Date().getHours();
+            let dataInfo = hour < 12 ? todayInfo : tomorrowInfo;
+            const { day_weather: wea, max_degree, min_degree } = dataInfo;
+            
+            let _wea = '';
+            // 雨，雪，冰雹，沙尘，雷，雾，阴，晴，云
+            if (wea.includes('雷')) {
+                _wea = `${wea} ☔️`
+            } else if (wea.includes('雨')) {
+                _wea = `${wea} ☔️`
+            } else if (wea.includes('雪')) {
+                _wea = `${wea} ☃️`
+            } else if (wea.includes('冰雹')) {
+                _wea = `${wea} ☔️`
+            } else if (wea.includes('沙') || wea.includes('尘')) {
+                _wea = `${wea} 💨`
+            } else if (wea.includes('雾') || wea.includes('霾')) {
+                _wea = `${wea} 🌫`
+            } else if (wea.includes('云')) {
+                _wea = `${wea} 🌤`
+            } else if (wea.includes('阴')) {
+                _wea = `${wea} ☁️`
+            } else if (wea.includes('晴')) {
+                _wea = `${wea} 🌞`
+            }
+            let data = `${hour < 12 ? '今' : '明'}日天气 ${_wea}\n最高温度 ${max_degree}\n最低温度 ${min_degree}\n空气质量 ${air.aqi_name}\n`;
+
+            //8.30 hours[1] 为 当前8:00:， hours[11] ，   20.30 hours[1] 为 20.00,hours[14]
+            const rains = ['雨', '雪', '冰雹', '雷'];
+            if (hour < 12 && (rains.some(item => hours[1].weather.includes(item) || hours[11].weather.includes(item))) || hour > 12 && (rains.some(item => hours[1].weather.includes(item) || hours[14].weather.includes(item))) ) {
+                data += `\n温馨小贴士\n亲爱的老婆大人，注意啦注意啦！${hour < 12 ? '今' : '明'}天上下班路上有降雨🌧，要记得带伞☂️喔~\n`
+            }
+
+            if (alarm.detail || alarm.level_name || alarm.type_name) {
+                data += `\n气象灾害预警\n${alarm.detail}\n`;
+            }
+
+            console.info('获取天行天气成功', data);
+            return data;
+        }
+    } catch (err) {
+        console.log('请求天气失败', err);
+        return '请求天气失败';
     }
 }
 
@@ -158,5 +216,6 @@ module.exports = {
     getWeather,
     getReply,
     getSweetWord,
-    getRubbishType
+    getRubbishType,
+    getNewWeather,
 };
