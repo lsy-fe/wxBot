@@ -40,7 +40,7 @@ module.exports = {
     // SENDDATE_REMIND: '0 5/1 17 * * 1-5', //定时提醒发送时间
     // SENDDATE_MEMORIAL: '0 5/1 17 * * *', //纪念日提醒发送时间
     
-    SENDDATE_WEATHER: '0 30 8/12 * * *', //定时天气发送时间 每天8点30分0秒发送，规则见 /schedule/index.js
+    SENDDATE_WEATHER: '0 10 14/12 * * *', //定时天气发送时间 每天8点30分0秒发送，规则见 /schedule/index.js
     SENDDATE_REMIND: '0 30 10-17/2 * * 1-5', //定时提醒发送时间 
     SENDDATE_MEMORIAL: '0 0 0 * * *', //纪念日提醒发送时间
     TXAPIKEY: '517ebb2e5f946dd9a55a4c3b3584a129', //此处须填写个人申请的天行apikey,请替换成自己的 申请地址https://www.tianapi.com/signup.html?source=474284281
